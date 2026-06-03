@@ -97,7 +97,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
           <div className="lg:col-span-1">
             <StudentForm
               onSubmit={handleSubmit}
@@ -106,7 +106,7 @@ const Dashboard = () => {
             />
           </div>
 
-          <div className="lg:col-span-2 space-y-5">
+          <div className="xl:col-span-3 space-y-5">
             <div className="bg-white p-4 rounded-2xl shadow border border-slate-200">
               <input
                 className="input"
