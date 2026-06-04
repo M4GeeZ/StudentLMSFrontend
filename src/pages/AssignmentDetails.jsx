@@ -23,6 +23,8 @@ const AssignmentDetails = () => {
       setStudentSubmissions(saved.studentSubmissions || []);
     }
   }, [storageKey]);
+  
+  const mode = location.state?.mode || "faculty";
 
   const saveToLocalStorage = (newTeacherFiles, newSubmissions) => {
     localStorage.setItem(
@@ -155,6 +157,7 @@ const AssignmentDetails = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Teacher Upload */}
+          {mode === "faculty" && (
           <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-6">
             <h2 className="text-2xl font-extrabold text-black mb-2">
               Teacher File Upload
@@ -236,13 +239,14 @@ const AssignmentDetails = () => {
                         >
                           Download
                         </a>
-
+{mode === "faculty" && (
                         <button
                           onClick={() => handleDeleteTeacherFile(file.id)}
                           className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm"
                         >
                           Delete
                         </button>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -250,7 +254,7 @@ const AssignmentDetails = () => {
               )}
             </div>
           </div>
-
+)}
           {/* Student Submission */}
           <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-6">
             <h2 className="text-2xl font-extrabold text-black mb-2">
@@ -348,12 +352,14 @@ const AssignmentDetails = () => {
                                 Download
                               </a>
 
+{mode === "faculty" && (
                               <button
                                 onClick={() => handleDeleteSubmission(item.id)}
                                 className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm"
                               >
                                 Delete
                               </button>
+                    )}
                             </div>
                           </td>
                         </tr>

@@ -10,14 +10,23 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [role, setRole] = useState("student");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       await register(name, email, password);
-      toast.success("Account created");
-      navigate("/dashboard");
+
+localStorage.setItem("userRole", role);
+
+toast.success('Account created');
+
+if (role === "student") {
+  navigate("/student-portal");
+} else {
+  navigate("/dashboard");
+}
     } catch (error) {
       toast.error(error.response?.data?.message || "Registration failed");
     } finally {
@@ -37,6 +46,31 @@ const Register = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-3 mb-4">
+  <button
+    type="button"
+    onClick={() => setRole("faculty")}
+    className={`py-3 rounded-xl font-semibold border transition ${
+      role === "faculty"
+        ? "bg-blue-600 text-white border-blue-600"
+        : "bg-white text-black border-slate-300"
+    }`}
+  >
+    Faculty
+  </button>
+
+  <button
+    type="button"
+    onClick={() => setRole("student")}
+    className={`py-3 rounded-xl font-semibold border transition ${
+      role === "student"
+        ? "bg-blue-600 text-white border-blue-600"
+        : "bg-white text-black border-slate-300"
+    }`}
+  >
+    Student
+  </button>
+</div>
           <input className="input" placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} required />
           <input className="input" type="email" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} required />
           <input className="input" type="password" placeholder="Password min 6 characters" value={password} onChange={(e) => setPassword(e.target.value)} required minLength="6" />

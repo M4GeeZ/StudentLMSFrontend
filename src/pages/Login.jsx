@@ -6,9 +6,25 @@ import { useAuth } from "../context/AuthContext.jsx";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("faculty");
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+
+  <div className="grid grid-cols-2 gap-3">
+  <button
+    type="button"
+    onClick={() => setRole("faculty")}
+    className={`py-3 rounded-xl font-semibold border transition ${
+      role === "faculty"
+        ? "bg-blue-600 text-white border-blue-600"
+        : "bg-white text-black border-slate-300"
+    }`}
+  >
+    Faculty
+  </button>
+</div>
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,7 +32,13 @@ const Login = () => {
     try {
       await login(email, password);
       toast.success("Login successful");
-      navigate("/dashboard");
+      localStorage.setItem("userRole", role);
+
+if (role === "student") {
+  navigate("/student-portal");
+} else {
+  navigate("/dashboard");
+}
     } catch (error) {
       toast.error(error.response?.data?.message || "Login failed");
     } finally {
@@ -39,6 +61,31 @@ const Login = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-3 mb-4">
+  <button
+    type="button"
+    onClick={() => setRole("faculty")}
+    className={`py-3 rounded-xl font-semibold border transition ${
+      role === "faculty"
+        ? "bg-blue-600 text-white border-blue-600"
+        : "bg-white text-black border-slate-300"
+    }`}
+  >
+    Faculty
+  </button>
+
+  <button
+    type="button"
+    onClick={() => setRole("student")}
+    className={`py-3 rounded-xl font-semibold border transition ${
+      role === "student"
+        ? "bg-blue-600 text-white border-blue-600"
+        : "bg-white text-black border-slate-300"
+    }`}
+  >
+    Student
+  </button>
+</div>
           <input className="input" type="email" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} required />
           <input className="input" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
 
