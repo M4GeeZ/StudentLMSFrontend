@@ -1,6 +1,7 @@
 import AssignmentPanel from "../components/AssignmentPanel.jsx";
 import AttendancePanel from "../components/AttendancePanel.jsx";
 import StudentTableSkeleton from "../components/AssignmentSkeleton.jsx";
+import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -82,19 +83,24 @@ const Dashboard = () => {
   }, [students]);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+  <motion.div
+    className="min-h-screen bg-slate-50"
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 }}
+  >
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
-          <div className="bg-blue-600 text-white rounded-2xl p-6 shadow">
+          <div className="bg-blue-600 text-white rounded-2xl p-6 shadow transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
             <p className="text-blue-100">Total Students</p>
             <h2 className="text-4xl font-bold mt-2">{stats.total}</h2>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow border border-slate-200">
+          <div className="bg-white rounded-2xl p-6 shadow border border-slate-200 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
             <p className="text-slate-500">Departments</p>
             <h2 className="text-4xl font-bold mt-2 text-slate-800">{stats.departments}</h2>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow border border-slate-200">
+          <div className="bg-white rounded-2xl p-6 shadow border border-slate-200 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
             <p className="text-slate-500">Active Semesters</p>
             <h2 className="text-4xl font-bold mt-2 text-slate-800">{stats.semesters}</h2>
           </div>
@@ -132,7 +138,7 @@ const Dashboard = () => {
         <AssignmentPanel />
         <AttendancePanel students={students} />
       </main>
-    </div>
+    </motion.div>
   );
 };
 

@@ -1,3 +1,13 @@
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -45,3 +55,46 @@ body {
     0 0 8px rgba(34, 211, 238, 0.5),
     0 0 20px rgba(34, 211, 238, 0.3);
 }
+
+/* Modern Scrollbar */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    to bottom,
+    #2563eb,
+    #06b6d4
+  );
+  border-radius: 50px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    to bottom,
+    #1d4ed8,
+    #0891b2
+  );
+}
+
+.student-card,
+.assignment-card,
+.attendance-card {
+  transition: all 0.35s ease;
+}
+
+.student-card:hover,
+.assignment-card:hover,
+.attendance-card:hover {
+  transform: translateY(-4px);
+}
+
+
+
+
