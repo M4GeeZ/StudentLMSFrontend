@@ -40,7 +40,7 @@ const StudentForm = ({ onSubmit, selectedStudent, clearSelected }) => {
   return (
     <div className="card p-6">
       <div className="flex items-center justify-between mb-5">
-        <h2 className="text-2xl font-extrabold text-white">
+        <h2 className="text-xl font-bold text-slate-800 mb-5 !text-black">
           {selectedStudent ? "Update Student" : "Add Student"}
         </h2>
 
@@ -78,7 +78,7 @@ const StudentForm = ({ onSubmit, selectedStudent, clearSelected }) => {
 />
         <input className="input !text-black" name="address" placeholder="Address Optional" value={formData.address} onChange={handleChange} />
 
-        <button className="btn-primary">
+        <button className="btn-primary ">
           {selectedStudent ? "Update Student" : "Add Student"}
         </button>
       </form>
