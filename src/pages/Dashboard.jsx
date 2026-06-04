@@ -1,5 +1,6 @@
 import AssignmentPanel from "../components/AssignmentPanel.jsx";
 import AttendancePanel from "../components/AttendancePanel.jsx";
+import StudentTableSkeleton from "../components/AssignmentSkeleton.jsx";
 import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -55,6 +56,7 @@ const Dashboard = () => {
       toast.error(error.response?.data?.message || 'Operation failed');
     }
   };
+  
 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this student?');
@@ -117,10 +119,14 @@ const Dashboard = () => {
               />
             </div>
             {loading ? (
-              <div className="bg-white rounded-2xl shadow p-8 text-center text-slate-500">Loading students...</div>
-            ) : (
-              <StudentTable students={students} onEdit={setSelectedStudent} onDelete={handleDelete} />
-            )}
+  <StudentTableSkeleton />
+) : (
+  <StudentTable
+    students={students}
+    onEdit={setSelectedStudent}
+    onDelete={handleDelete}
+  />
+)}
           </div>
         </div>
         <AssignmentPanel />

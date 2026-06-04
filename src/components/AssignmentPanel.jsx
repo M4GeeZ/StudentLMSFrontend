@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext.jsx";
+import AssignmentSkeleton from "./AssignmentSkeleton";
 
 const AssignmentPanel = () => {
+  const [loading, setLoading] = useState(true);
   const { user, API_URL } = useAuth();
   const [assignments, setAssignments] = useState([]);
   const [formData, setFormData] = useState({
@@ -21,13 +23,22 @@ const AssignmentPanel = () => {
   };
 
   const fetchAssignments = async () => {
-    try {
-      const { data } = await axios.get(`${API_URL}/api/assignments`, config);
-      setAssignments(data);
-    } catch {
-      toast.error("Failed to fetch assignments");
-    }
-  };
+  try {
+    setLoading(true);
+
+     await new Promise(resolve => setTimeout(resolve, 2000));
+    const { data } = await axios.get(
+      `${API_URL}/api/assignments`,
+      config
+    );
+
+    setAssignments(data);
+  } catch {
+    toast.error("Failed to fetch assignments");
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchAssignments();
@@ -100,10 +111,14 @@ const AssignmentPanel = () => {
         <div className="bg-white rounded-2xl shadow border border-slate-200 p-6">
           <h2 className="text-xl font-bold text-slate-800 mb-5">Assignments for Students</h2>
 
-          {assignments.length === 0 ? (
-            <p className="text-slate-500 text-center py-8">No assignments added yet</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {loading ? (
+  <AssignmentSkeleton />
+) : assignments.length === 0 ? (
+  <p className="text-slate-500 text-center py-8">
+    No assignments added yet
+  </p>
+) : (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {assignments.map((item) => {
                 const status = getDeadlineStatus(item.deadline);
 
