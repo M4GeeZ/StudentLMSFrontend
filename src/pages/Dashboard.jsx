@@ -1,4 +1,5 @@
 import AssignmentPanel from "../components/AssignmentPanel.jsx";
+import AttendancePanel from "../components/AttendancePanel.jsx";
 import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -123,6 +124,7 @@ const Dashboard = () => {
           </div>
         </div>
         <AssignmentPanel />
+        <AttendancePanel students={students} />
       </main>
     </div>
   );

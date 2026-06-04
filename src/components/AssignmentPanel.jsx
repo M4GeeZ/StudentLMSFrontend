@@ -115,7 +115,7 @@ const AssignmentPanel = () => {
                         <p className="text-blue-600 font-semibold text-sm">{item.subject}</p>
                       </div>
 
-                      <span className={`h-fit px-3 py-1 rounded-full text-xs font-semibold ${status.color}`}>
+                      <span className={`h-fit px-3 py-1 rounded-full text-xs !text-black font-semibold ${status.color}`}>
                         {status.text}
                       </span>
                     </div>
