@@ -1,4 +1,5 @@
 import React from "react";
+import AssignmentDetails from "./pages/AssignmentDetails.jsx";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
@@ -26,6 +27,15 @@ const App = () => {
           </ProtectedRoute>
         }
       />
+      
+      <Route
+  path="/assignments/:id"
+  element={
+    <ProtectedRoute>
+      <AssignmentDetails />
+    </ProtectedRoute>
+  }
+/>
     </Routes>
   );
 };
