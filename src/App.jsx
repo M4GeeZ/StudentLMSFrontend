@@ -1,5 +1,5 @@
 import React from "react";
-import StudentPortal from "./pages/StudentPortal.jsx";
+import StudentPortal from './pages/StudentPortal.jsx';
 import AssignmentDetails from "./pages/AssignmentDetails.jsx";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from './pages/Login.jsx';
@@ -28,13 +28,28 @@ const App = () => {
           </ProtectedRoute>
         }
       />
-
-<Route
+      
+      <Route
   path="/student-portal"
   element={
     <ProtectedRoute>
       <StudentPortal />
     </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/"
+  element={
+    user ? (
+      localStorage.getItem("userRole") === "student" ? (
+        <Navigate to="/student-portal" />
+      ) : (
+        <Navigate to="/dashboard" />
+      )
+    ) : (
+      <Navigate to="/login" />
+    )
   }
 />
 

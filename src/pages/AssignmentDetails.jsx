@@ -6,6 +6,7 @@ const AssignmentDetails = () => {
   const { id } = useParams();
   const location = useLocation();
   const assignment = location.state?.assignment;
+  const mode = location.state?.mode || "faculty";
 
   const storageKey = `assignment_demo_${id}`;
 
@@ -17,14 +18,11 @@ const AssignmentDetails = () => {
 
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem(storageKey));
-
     if (saved) {
       setTeacherFiles(saved.teacherFiles || []);
       setStudentSubmissions(saved.studentSubmissions || []);
     }
   }, [storageKey]);
-  
-  const mode = location.state?.mode || "faculty";
 
   const saveToLocalStorage = (newTeacherFiles, newSubmissions) => {
     localStorage.setItem(
@@ -32,9 +30,22 @@ const AssignmentDetails = () => {
       JSON.stringify({
         teacherFiles: newTeacherFiles,
         studentSubmissions: newSubmissions,
-      }),
+      })
     );
   };
+
+const handleGradeSubmission = (itemId) => {
+  const marks = prompt("Enter Marks out of 10");
+  if (!marks) return;
+
+  const updated = studentSubmissions.map((sub) =>
+    sub.id === itemId ? { ...sub, marks, status: "Checked" } : sub
+  );
+
+  setStudentSubmissions(updated);
+  saveToLocalStorage(teacherFiles, updated);
+  toast.success("Marks Assigned");
+};
 
   const formatSize = (size) => {
     if (size < 1024) return `${size} Bytes`;
@@ -44,10 +55,9 @@ const AssignmentDetails = () => {
 
   const getFileType = (file) => {
     if (!file) return "Unknown";
-    if (file.type.includes("pdf")) return "PDF";
-    if (file.type.includes("image")) return "Image";
-    if (file.type.includes("word") || file.name.endsWith(".docx"))
-      return "Document";
+    if (file.type?.includes("pdf")) return "PDF";
+    if (file.type?.includes("image")) return "Image";
+    if (file.type?.includes("word") || file.name.endsWith(".docx")) return "Document";
     return "File";
   };
 
@@ -93,6 +103,8 @@ const AssignmentDetails = () => {
       submittedAt: new Date().toLocaleString(),
       status: "Submitted",
       url: URL.createObjectURL(selectedStudentFile),
+      marks: null,
+      remarks: "",
     };
 
     const updatedSubmissions = [newSubmission, ...studentSubmissions];
@@ -111,23 +123,22 @@ const AssignmentDetails = () => {
   };
 
   const handleDeleteSubmission = (submissionId) => {
-    const updated = studentSubmissions.filter(
-      (item) => item.id !== submissionId,
-    );
+    const updated = studentSubmissions.filter((item) => item.id !== submissionId);
     setStudentSubmissions(updated);
     saveToLocalStorage(teacherFiles, updated);
     toast.success("Submission removed");
   };
 
+
   return (
     <div className="min-h-screen bg-slate-100 px-4 py-8">
       <div className="max-w-7xl mx-auto">
         <Link
-          to="/dashboard"
-          className="inline-block mb-6 px-5 py-2 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition"
-        >
-          ← Back to Dashboard
-        </Link>
+  to={localStorage.getItem("userRole") === "student" ? "/student-portal" : "/dashboard"}
+  className="inline-block mb-6 px-5 py-2 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition"
+>
+  ← Back
+</Link>
 
         <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
@@ -139,8 +150,7 @@ const AssignmentDetails = () => {
                 {assignment?.title || "Assignment"}
               </h1>
               <p className="text-slate-600 mt-2">
-                {assignment?.description ||
-                  "Upload and submit assignment files."}
+                {assignment?.description || "Upload and submit assignment files."}
               </p>
             </div>
 
@@ -156,62 +166,69 @@ const AssignmentDetails = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Teacher Upload */}
-          {mode === "faculty" && (
           <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-6">
             <h2 className="text-2xl font-extrabold text-black mb-2">
-              Teacher File Upload
+              Assignment Files
             </h2>
+
             <p className="text-slate-500 mb-5">
-              Upload assignment PDF, document, picture or any small demo file.
+              {mode === "faculty"
+                ? "Upload assignment files for students."
+                : "Download assignment files uploaded by faculty."}
             </p>
 
-            <div className="border-2 border-dashed border-blue-300 rounded-3xl p-8 bg-blue-50/60 text-center hover:border-blue-500 transition">
-              <div className="text-5xl mb-3">📤</div>
-              <h3 className="text-xl font-bold text-black">
-                Upload Assignment File
-              </h3>
-              <p className="text-slate-500 text-sm mt-1">
-                PDF, DOCX, JPG, PNG, TXT supported for demo
-              </p>
+            {mode === "faculty" && (
+              <div className="border-2 border-dashed border-blue-300 rounded-3xl p-8 bg-blue-50/60 text-center hover:border-blue-500 transition">
+                <div className="text-5xl mb-3">📤</div>
 
-              <input
-                id="teacherFile"
-                type="file"
-                className="hidden"
-                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
-                onChange={(e) => setSelectedTeacherFile(e.target.files[0])}
-              />
+                <h3 className="text-xl font-bold text-black">
+                  Upload Assignment File
+                </h3>
 
-              <label
-                htmlFor="teacherFile"
-                className="inline-block mt-5 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl cursor-pointer transition"
-              >
-                Choose File
-              </label>
+                <p className="text-slate-500 text-sm mt-1">
+                  PDF, DOCX, JPG, PNG, TXT supported for demo
+                </p>
 
-              {selectedTeacherFile && (
-                <div className="mt-5 bg-white border border-slate-200 rounded-2xl p-4 text-left">
-                  <p className="font-bold text-black">
-                    {selectedTeacherFile.name}
-                  </p>
-                  <p className="text-sm text-slate-500">
-                    {getFileType(selectedTeacherFile)} •{" "}
-                    {formatSize(selectedTeacherFile.size)}
-                  </p>
-                </div>
-              )}
+                <input
+                  id="teacherFile"
+                  type="file"
+                  className="hidden"
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
+                  onChange={(e) => setSelectedTeacherFile(e.target.files[0])}
+                />
 
-              <button
-                onClick={handleTeacherUpload}
-                className="mt-5 w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition"
-              >
-                Upload File
-              </button>
-            </div>
+                <label
+                  htmlFor="teacherFile"
+                  className="inline-block mt-5 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl cursor-pointer transition"
+                >
+                  Choose File
+                </label>
+
+                {selectedTeacherFile && (
+                  <div className="mt-5 bg-white border border-slate-200 rounded-2xl p-4 text-left">
+                    <p className="font-bold text-black">
+                      {selectedTeacherFile.name}
+                    </p>
+                    <p className="text-sm text-slate-500">
+                      {getFileType(selectedTeacherFile)} •{" "}
+                      {formatSize(selectedTeacherFile.size)}
+                    </p>
+                  </div>
+                )}
+
+                <button
+                  onClick={handleTeacherUpload}
+                  className="mt-5 w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition"
+                >
+                  Upload File
+                </button>
+              </div>
+            )}
 
             <div className="mt-6">
-              <h3 className="font-extrabold text-black mb-3">Uploaded Files</h3>
+              <h3 className="font-extrabold text-black mb-3">
+                Uploaded Files
+              </h3>
 
               {teacherFiles.length === 0 ? (
                 <p className="text-slate-500 bg-slate-50 rounded-2xl p-5 text-center">
@@ -239,13 +256,14 @@ const AssignmentDetails = () => {
                         >
                           Download
                         </a>
-{mode === "faculty" && (
-                        <button
-                          onClick={() => handleDeleteTeacherFile(file.id)}
-                          className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm"
-                        >
-                          Delete
-                        </button>
+
+                        {mode === "faculty" && (
+                          <button
+                            onClick={() => handleDeleteTeacherFile(file.id)}
+                            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm"
+                          >
+                            Delete
+                          </button>
                         )}
                       </div>
                     </div>
@@ -254,68 +272,77 @@ const AssignmentDetails = () => {
               )}
             </div>
           </div>
-)}
-          {/* Student Submission */}
+
           <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-6">
             <h2 className="text-2xl font-extrabold text-black mb-2">
               Student Submission
             </h2>
+
             <p className="text-slate-500 mb-5">
               Students can upload their completed assignment file here.
             </p>
 
-            <div className="grid grid-cols-1 gap-4">
-              <input
-                className="w-full px-4 py-3 rounded-xl border border-slate-300 text-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                placeholder="Student Name"
-                value={studentName}
-                onChange={(e) => setStudentName(e.target.value)}
-              />
-
-              <div className="border-2 border-dashed border-cyan-300 rounded-3xl p-8 bg-cyan-50/60 text-center">
-                <div className="text-5xl mb-3">📝</div>
-                <h3 className="text-xl font-bold text-black">
-                  Submit Your Work
-                </h3>
-                <p className="text-slate-500 text-sm mt-1">
-                  Upload PDF, picture or document
-                </p>
-
+            
+              <div className="grid grid-cols-1 gap-4">
                 <input
-                  id="studentFile"
-                  type="file"
-                  className="hidden"
-                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
-                  onChange={(e) => setSelectedStudentFile(e.target.files[0])}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-300 text-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                  placeholder="Student Name"
+                  value={studentName}
+                  onChange={(e) => setStudentName(e.target.value)}
                 />
 
-                <label
-                  htmlFor="studentFile"
-                  className="inline-block mt-5 px-6 py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold rounded-xl cursor-pointer transition"
-                >
-                  Choose Submission File
-                </label>
+                <div className="border-2 border-dashed border-cyan-300 rounded-3xl p-8 bg-cyan-50/60 text-center">
+                  <div className="text-5xl mb-3">📝</div>
 
-                {selectedStudentFile && (
-                  <div className="mt-5 bg-white border border-slate-200 rounded-2xl p-4 text-left">
-                    <p className="font-bold text-black">
-                      {selectedStudentFile.name}
-                    </p>
-                    <p className="text-sm text-slate-500">
-                      {getFileType(selectedStudentFile)} •{" "}
-                      {formatSize(selectedStudentFile.size)}
-                    </p>
-                  </div>
-                )}
+                  <h3 className="text-xl font-bold text-black">
+                    Submit Your Work
+                  </h3>
 
-                <button
-                  onClick={handleStudentSubmit}
-                  className="mt-5 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition"
-                >
-                  Submit Assignment
-                </button>
+                  <p className="text-slate-500 text-sm mt-1">
+                    Upload PDF, picture or document
+                  </p>
+
+                  <input
+                    id="studentFile"
+                    type="file"
+                    className="hidden"
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
+                    onChange={(e) => setSelectedStudentFile(e.target.files[0])}
+                  />
+
+                  <label
+                    htmlFor="studentFile"
+                    className="inline-block mt-5 px-6 py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold rounded-xl cursor-pointer transition"
+                  >
+                    Choose Submission File
+                  </label>
+
+                  {selectedStudentFile && (
+                    <div className="mt-5 bg-white border border-slate-200 rounded-2xl p-4 text-left">
+                      <p className="font-bold text-black">
+                        {selectedStudentFile.name}
+                      </p>
+                      <p className="text-sm text-slate-500">
+                        {getFileType(selectedStudentFile)} •{" "}
+                        {formatSize(selectedStudentFile.size)}
+                      </p>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={handleStudentSubmit}
+                    className="mt-5 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition"
+                  >
+                    Submit Assignment
+                  </button>
+                </div>
               </div>
-            </div>
+
+            {mode === "faculty" && (
+              <p className="text-slate-500 bg-slate-50 rounded-2xl p-5 text-center mb-5">
+                Faculty can review, download, grade, and delete student submissions.
+              </p>
+            )}
 
             <div className="mt-6">
               <h3 className="font-extrabold text-black mb-3">Submitted Work</h3>
@@ -328,43 +355,85 @@ const AssignmentDetails = () => {
                 <div className="overflow-x-auto rounded-2xl border border-slate-200">
                   <table className="w-full text-left">
                     <thead className="bg-slate-900 text-white">
-                      <tr>
-                        <th className="p-4">Student</th>
-                        <th className="p-4">File</th>
-                        <th className="p-4">Status</th>
-                        <th className="p-4">Action</th>
-                      </tr>
-                    </thead>
+  <tr>
+    <th className="p-4">Student</th>
+    <th className="p-4">File</th>
+    <th className="p-4">Status</th>
+    <th className="p-4">Marks</th>
+    <th className="p-4">Action</th>
+  </tr>
+</thead>
 
                     <tbody>
-                      {studentSubmissions.map((item) => (
-                        <tr key={item.id} className="border-t border-slate-200">
-                          <td className="p-4 font-bold text-black">
-                            {item.studentName}
-                          </td>
-                          <td className="p-4">
-                            <div className="flex gap-2">
-                              <a
-                                href={item.url}
-                                download={item.fileName}
-                                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm"
-                              >
-                                Download
-                              </a>
+  {studentSubmissions.map((item) => (
+    <tr key={item.id} className="border-t border-slate-200">
+      <td className="p-4 font-bold text-black">
+        {item.studentName}
+      </td>
 
-{mode === "faculty" && (
-                              <button
-                                onClick={() => handleDeleteSubmission(item.id)}
-                                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm"
-                              >
-                                Delete
-                              </button>
-                    )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
+      <td className="p-4">
+        <p className="font-semibold text-black">
+          {item.fileName}
+        </p>
+        <p className="text-sm text-slate-500">
+          {item.type} • {item.size} • {item.submittedAt}
+        </p>
+      </td>
+
+      <td className="p-4">
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-bold ${
+            item.status === "Checked"
+              ? "bg-blue-100 text-blue-700"
+              : "bg-green-100 text-green-700"
+          }`}
+        >
+          {item.status || "Submitted"}
+        </span>
+      </td>
+
+      <td className="p-4">
+        {item.marks ? (
+          <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold">
+            {item.marks}/10
+          </span>
+        ) : (
+          <span className="text-slate-400 font-semibold">
+            Pending
+          </span>
+        )}
+      </td>
+
+      <td className="p-4">
+        <div className="flex gap-2">
+          <a
+            href={item.url}
+            download={item.fileName}
+            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm"
+          >
+            Download
+          </a>
+
+          {mode === "faculty" && (
+            <button
+              onClick={() => handleGradeSubmission(item.id)}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm"
+            >
+              Grade
+            </button>
+          )}
+
+          <button
+            onClick={() => handleDeleteSubmission(item.id)}
+            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm"
+          >
+            Delete
+          </button>
+        </div>
+      </td>
+    </tr>
+  ))}
+</tbody>
                   </table>
                 </div>
               )}

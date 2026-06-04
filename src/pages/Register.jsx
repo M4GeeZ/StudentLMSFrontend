@@ -7,14 +7,26 @@ const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+const [showPassword, setShowPassword] = useState(false);
+const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
   const [role, setRole] = useState("student");
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+
+if (password !== confirmPassword) {
+  toast.error("Passwords do not match");
+  return;
+}
+
+if (password !== confirmPassword) {
+  toast.error("Passwords do not match");
+  return;
+}
+setLoading(true);
     try {
       await register(name, email, password);
 
@@ -73,8 +85,52 @@ if (role === "student") {
 </div>
           <input className="input" placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} required />
           <input className="input" type="email" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <input className="input" type="password" placeholder="Password min 6 characters" value={password} onChange={(e) => setPassword(e.target.value)} required minLength="6" />
+<div className="relative">
+  <input
+    className="input pr-12"
+    type={showPassword ? "text" : "password"}
+    placeholder="Password min 6 characters"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    required
+    minLength="6"
+  />
 
+ <button
+  type="button"
+  onClick={() => setShowPassword(!showPassword)}
+  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-blue-600 transition"
+>
+  {showPassword ? (
+    <i className="fa-regular fa-eye"></i>
+  ) : (
+    <i className="fa-regular fa-eye-slash"></i>
+  )}
+</button>
+</div>
+
+<div className="relative">
+  <input
+    className="input pr-12"
+    type={showConfirmPassword ? "text" : "password"}
+    placeholder="Confirm Password"
+    value={confirmPassword}
+    onChange={(e) => setConfirmPassword(e.target.value)}
+    required
+    minLength="6"
+  />
+  <button
+  type="button"
+  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-blue-600 transition"
+>
+  {showConfirmPassword ? (
+    <i className="fa-regular fa-eye"></i>
+  ) : (
+    <i className="fa-regular fa-eye-slash"></i>
+  )}
+</button>
+</div>
           <button disabled={loading} className="btn-primary w-full">
             {loading ? "Please wait..." : "Register"}
           </button>
