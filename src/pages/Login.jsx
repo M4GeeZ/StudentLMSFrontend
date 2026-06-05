@@ -6,34 +6,64 @@ import { useAuth } from "../context/AuthContext.jsx";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("faculty");
+  const [role, setRole] = useState("admin");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      await login(email, password);
+  try {
+    if (role === "admin") {
+      if (email === "thorm3821@gmail.com" && password === "r98@RtRh") {
+        localStorage.setItem("userRole", "admin");
+        localStorage.setItem(
+          "adminUser",
+          JSON.stringify({
+            name: "Admin",
+            email: "thorm3821@gmail.com",
+            role: "admin",
+          })
+        );
+        if (
+  email === "thorm3821@gmail.com" &&
+  password === "r98@RtRh" &&
+  role !== "admin"
+) {
+  toast.error("Admin account can only login as Admin");
+  setLoading(false);
+  return;
+}
 
-      localStorage.setItem("userRole", role);
-
-      toast.success("Login successful");
-
-      if (role === "student") {
-        navigate("/student-portal");
+        toast.success("Admin login successful");
+        navigate("/admin-dashboard");
+        return;
       } else {
-        navigate("/dashboard");
+        toast.error("Invalid admin credentials");
+        return;
       }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Login failed");
-    } finally {
-      setLoading(false);
     }
-  };
+
+    await login(email, password);
+
+    localStorage.setItem("userRole", role);
+
+    toast.success("Login successful");
+
+    if (role === "student") {
+      navigate("/student-portal");
+    } else {
+      navigate("/dashboard");
+    }
+  } catch (error) {
+    toast.error(error.response?.data?.message || "Login failed");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[radial-gradient(circle_at_top_left,#0ea5e9,transparent_30%),linear-gradient(135deg,#020617,#0f172a,#111827)] px-4">
@@ -56,31 +86,44 @@ const Login = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <button
-              type="button"
-              onClick={() => setRole("faculty")}
-              className={`py-3 rounded-xl font-semibold border transition ${
-                role === "faculty"
-                  ? "bg-blue-600 text-white border-blue-600"
-                  : "bg-white text-black border-slate-300"
-              }`}
-            >
-              Faculty
-            </button>
+        
+        <div className="grid grid-cols-3 gap-3 mb-4">
+  <button
+    type="button"
+    onClick={() => setRole("admin")}
+    className={`py-3 rounded-xl font-semibold border transition ${
+      role === "admin"
+        ? "bg-blue-600 text-white border-blue-600"
+        : "bg-white text-black border-slate-300"
+    }`}
+  >
+    Admin
+  </button>
 
-            <button
-              type="button"
-              onClick={() => setRole("student")}
-              className={`py-3 rounded-xl font-semibold border transition ${
-                role === "student"
-                  ? "bg-blue-600 text-white border-blue-600"
-                  : "bg-white text-black border-slate-300"
-              }`}
-            >
-              Student
-            </button>
-          </div>
+  <button
+    type="button"
+    onClick={() => setRole("faculty")}
+    className={`py-3 rounded-xl font-semibold border transition ${
+      role === "faculty"
+        ? "bg-blue-600 text-white border-blue-600"
+        : "bg-white text-black border-slate-300"
+    }`}
+  >
+    Faculty
+  </button>
+
+  <button
+    type="button"
+    onClick={() => setRole("student")}
+    className={`py-3 rounded-xl font-semibold border transition ${
+      role === "student"
+        ? "bg-blue-600 text-white border-blue-600"
+        : "bg-white text-black border-slate-300"
+    }`}
+  >
+    Student
+  </button>
+</div>
 
           <input
             className="input"
@@ -119,15 +162,18 @@ const Login = () => {
           </button>
         </form>
 
-        <p className="text-center mt-6 text-slate-400">
-          No account?{" "}
-          <Link
-            to="/register"
-            className="text-cyan-400 font-semibold hover:underline"
-          >
-            Register
-          </Link>
-        </p>
+        {role !== "admin" && (
+  <p className="text-center mt-6 text-slate-400">
+    No account?{" "}
+    <Link
+      to="/register"
+      className="text-cyan-400 font-semibold hover:underline"
+    >
+      Register
+    </Link>
+  </p>
+)}
+
       </div>
     </div>
   );

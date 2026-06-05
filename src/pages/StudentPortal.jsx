@@ -9,6 +9,14 @@ const StudentPortal = () => {
   const [assignments, setAssignments] = useState([]);
   const [attendance, setAttendance] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [studentTimetable, setStudentTimetable] = useState([]);
+
+  useEffect(() => {
+  const savedStudentTimetable =
+    JSON.parse(localStorage.getItem("studentTimetableRecords")) || [];
+
+  setStudentTimetable(savedStudentTimetable);
+}, []);
 
   const config = {
     headers: {
@@ -144,6 +152,70 @@ const StudentPortal = () => {
                 </div>
               )}
             </section>
+
+            <section className="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 mb-8">
+  <h2 className="text-2xl font-extrabold text-black mb-2">
+    My Timetable
+  </h2>
+
+  <p className="text-slate-500 mb-5">
+    Your class schedule assigned by admin.
+  </p>
+
+  {studentTimetable.length === 0 ? (
+    <p className="text-slate-500 bg-slate-50 rounded-2xl p-6 text-center">
+      No timetable assigned yet.
+    </p>
+  ) : (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {studentTimetable.map((item) => (
+        <div
+          key={item.id}
+          className="border border-slate-200 rounded-2xl p-5 bg-slate-50 hover:shadow-lg transition"
+        >
+          <div className="flex justify-between gap-3">
+            <div>
+              <p className="text-sm font-bold text-blue-600 uppercase">
+                {item.day}
+              </p>
+
+              <h3 className="font-extrabold text-black text-xl">
+                {item.subject}
+              </h3>
+
+              <p className="text-slate-500 text-sm">
+                Teacher: {item.teacherName}
+              </p>
+            </div>
+
+            <span className="h-fit px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">
+              Semester {item.semester}
+            </span>
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="bg-white rounded-xl p-3">
+              <p className="text-slate-500 text-sm">Department</p>
+              <p className="font-bold text-black">{item.department}</p>
+            </div>
+
+            <div className="bg-white rounded-xl p-3">
+              <p className="text-slate-500 text-sm">Room</p>
+              <p className="font-bold text-black">{item.room}</p>
+            </div>
+          </div>
+
+          <div className="mt-3 bg-blue-50 rounded-xl p-3">
+            <p className="text-slate-500 text-sm">Time</p>
+            <p className="font-extrabold text-blue-700">
+              {item.startTime} - {item.endTime}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+</section>
 
             <section className="bg-white rounded-3xl shadow-xl border border-slate-200 p-6">
               <h2 className="text-2xl font-extrabold text-black mb-5">

@@ -17,12 +17,32 @@ const Dashboard = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
+  const [myTimetable, setMyTimetable] = useState([]);
+
+  useEffect(() => {
+  const savedTimetable =
+    JSON.parse(localStorage.getItem("timetableRecords")) || [];
+
+  const filtered = savedTimetable.filter(
+    (item) =>
+      item.facultyEmail?.toLowerCase() === user?.email?.toLowerCase()
+  );
+
+  setMyTimetable(filtered);
+}, [user?.email]);
 
   const config = {
     headers: {
       Authorization: `Bearer ${user?.token}`,
     },
   };
+
+  useEffect(() => {
+  const savedTimetable =
+    JSON.parse(localStorage.getItem("timetableRecords")) || [];
+
+  setMyTimetable(savedTimetable);
+}, []);
 
   const fetchStudents = async () => {
     setLoading(true);
@@ -41,22 +61,43 @@ const Dashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
+ 
   const handleSubmit = async (formData) => {
-    try {
-      if (selectedStudent) {
-        const { data } = await axios.put(`${API_URL}/api/students/${selectedStudent._id}`, formData, config);
-        setStudents(students.map((student) => (student._id === data._id ? data : student)));
-        setSelectedStudent(null);
-        toast.success('Student updated');
-      } else {
-        const { data } = await axios.post(`${API_URL}/api/students`, formData, config);
-        setStudents([data, ...students]);
-        toast.success('Student added');
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Operation failed');
+  try {
+    if (selectedStudent) {
+      const { data } = await axios.put(
+        `${API_URL}/api/students/${selectedStudent._id}`,
+        formData,
+        config
+      );
+
+      const updatedStudents = students.map((student) =>
+        student._id === data._id ? data : student
+      );
+
+      setStudents(updatedStudents);
+      localStorage.setItem("adminStudents", JSON.stringify(updatedStudents));
+
+      setSelectedStudent(null);
+      toast.success("Student updated");
+    } else {
+      const { data } = await axios.post(
+        `${API_URL}/api/students`,
+        formData,
+        config
+      );
+
+      const updatedStudents = [data, ...students];
+
+      setStudents(updatedStudents);
+      localStorage.setItem("adminStudents", JSON.stringify(updatedStudents));
+
+      toast.success("Student added");
     }
-  };
+  } catch (error) {
+    toast.error(error.response?.data?.message || "Operation failed");
+  }
+};
   
 
   const handleDelete = async (id) => {
@@ -136,6 +177,66 @@ const Dashboard = () => {
           </div>
         </div>
         <AssignmentPanel />
+        <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 mt-8">
+  <h2 className="text-2xl font-extrabold text-black mb-2">
+    My Assigned Timetable
+  </h2>
+  <p className="text-slate-500 mb-5">
+    Your classes assigned by admin.
+  </p>
+
+  {myTimetable.length === 0 ? (
+    <div className="bg-slate-50 rounded-2xl p-6 text-center text-slate-500">
+      No timetable assigned yet.
+    </div>
+  ) : (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {myTimetable.map((item) => (
+        <div
+          key={item.id}
+          className="border border-slate-200 rounded-2xl p-5 bg-slate-50"
+        >
+          <div className="flex justify-between gap-3">
+            <div>
+              <p className="text-sm font-bold text-cyan-600 uppercase">
+                {item.day}
+              </p>
+              <h3 className="font-extrabold text-black text-xl">
+                {item.subject}
+              </h3>
+              <p className="text-slate-500 text-sm">
+                {item.departments}
+              </p>
+            </div>
+
+            <span className="h-fit px-3 py-1 rounded-full bg-cyan-100 text-cyan-700 text-xs font-bold">
+              Semester {item.semester}
+            </span>
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="bg-white rounded-xl p-3">
+              <p className="text-slate-500 text-sm">Class</p>
+              <p className="font-bold text-black">{item.className}</p>
+            </div>
+
+            <div className="bg-white rounded-xl p-3">
+              <p className="text-slate-500 text-sm">Room</p>
+              <p className="font-bold text-black">{item.room}</p>
+            </div>
+          </div>
+
+          <div className="mt-3 bg-blue-50 rounded-xl p-3">
+            <p className="text-slate-500 text-sm">Time</p>
+            <p className="font-extrabold text-blue-700">
+              {item.startTime} - {item.endTime}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
         <AttendancePanel students={students} />
       </main>
     </motion.div>

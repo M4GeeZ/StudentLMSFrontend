@@ -6,6 +6,11 @@ import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import { useAuth } from './context/AuthContext.jsx';
+import AdminDashboard from "./pages/AdminDashboard.jsx";
+import FacultyManagement from "./pages/FacultyManagement.jsx";
+import AdminStudentManagement from "./pages/AdminStudentManagement.jsx";
+import SalaryModule from "./pages/SalaryModule.jsx";
+import TimetableModule from "./pages/TimetableModule.jsx";
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -28,6 +33,12 @@ const App = () => {
           </ProtectedRoute>
         }
       />
+
+      <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      <Route path="/admin/timetable" element={<TimetableModule />} />
+      <Route path="/admin/faculty" element={<FacultyManagement />} />
+      <Route path="/admin/students" element={<AdminStudentManagement />} />
+      <Route path="/admin/salary" element={<SalaryModule />} />
       
       <Route
   path="/student-portal"
