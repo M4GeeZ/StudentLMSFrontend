@@ -49,11 +49,12 @@ useEffect(() => {
   const savedAnnouncements =
     JSON.parse(localStorage.getItem("announcements")) || [];
 
-  const teacherOnly = savedAnnouncements.filter(
-    (item) => item.audience === "teachers"
+  const teacherSideAnnouncements = savedAnnouncements.filter(
+    (item) =>
+      item.audience === "teachers" || item.audience === "students"
   );
 
-  setTeacherAnnouncements(teacherOnly);
+  setTeacherAnnouncements(teacherSideAnnouncements);
 }, []);
 
   const fetchStudents = async () => {
@@ -190,11 +191,11 @@ useEffect(() => {
         </div>
         <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 mt-8 mb-8">
   <h2 className="text-2xl font-extrabold text-black mb-2">
-    Teacher Announcements
-  </h2>
-  <p className="text-slate-500 mb-5">
-    Notices published by admin for faculty members.
-  </p>
+  Announcements
+</h2>
+<p className="text-slate-500 mb-5">
+  Notices published by admin for teachers and students.
+</p>
 
   {teacherAnnouncements.length === 0 ? (
     <div className="bg-slate-50 rounded-2xl p-6 text-center text-slate-500">
@@ -209,15 +210,24 @@ useEffect(() => {
         >
           <div className="flex justify-between gap-3">
             <div>
-              <p className="text-sm font-bold text-purple-600 uppercase">
-                Admin Notice
-              </p>
 
-              <h3 className="font-extrabold text-black text-xl">
-                {item.title}
-              </h3>
+              <p
+  className={`text-sm font-bold uppercase ${
+    item.audience === "teachers"
+      ? "text-purple-600"
+      : "text-green-600"
+  }`}
+>
+  {item.audience === "teachers"
+    ? "Teacher Notice"
+    : "Student Notice"}
+</p>
+
+<h3 className="font-extrabold text-black text-xl">
+  {item.title}
+</h3>
+
             </div>
-
             <span
               className={`h-fit px-3 py-1 rounded-full text-xs font-bold ${
                 item.priority === "Urgent"
