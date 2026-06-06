@@ -19,6 +19,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [myTimetable, setMyTimetable] = useState([]);
   const [teacherAnnouncements, setTeacherAnnouncements] = useState([]);
+  const [announcementFilter, setAnnouncementFilter] = useState("all");
 
   useEffect(() => {
   const savedTimetable =
@@ -56,6 +57,11 @@ useEffect(() => {
 
   setTeacherAnnouncements(teacherSideAnnouncements);
 }, []);
+
+const filteredAnnouncements = teacherAnnouncements.filter((item) => {
+  if (announcementFilter === "all") return true;
+  return item.audience === announcementFilter;
+});
 
   const fetchStudents = async () => {
     setLoading(true);
@@ -197,13 +203,70 @@ useEffect(() => {
   Notices published by admin for teachers and students.
 </p>
 
+<div className="flex flex-wrap gap-3 mb-5">
+  <button
+    onClick={() => setAnnouncementFilter("all")}
+    className={`px-4 py-2 rounded-xl font-semibold transition ${
+      announcementFilter === "all"
+        ? "bg-blue-600 text-white"
+        : "bg-slate-100 text-black"
+    }`}
+  >
+    All
+  </button>
+
+  <button
+    onClick={() => setAnnouncementFilter("teachers")}
+    className={`px-4 py-2 rounded-xl font-semibold transition ${
+      announcementFilter === "teachers"
+        ? "bg-purple-600 text-white"
+        : "bg-slate-100 text-black"
+    }`}
+  >
+    Teacher Announcements
+  </button>
+
+  <button
+    onClick={() => setAnnouncementFilter("students")}
+    className={`px-4 py-2 rounded-xl font-semibold transition ${
+      announcementFilter === "students"
+        ? "bg-green-600 text-white"
+        : "bg-slate-100 text-black"
+    }`}
+  >
+    Student Announcements
+  </button>
+</div>
+
+<div className="flex gap-3 mb-5">
+  <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-sm">
+    All: {teacherAnnouncements.length}
+  </span>
+
+  <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700 font-bold text-sm">
+    Teachers: {
+      teacherAnnouncements.filter(
+        (item) => item.audience === "teachers"
+      ).length
+    }
+  </span>
+
+  <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 font-bold text-sm">
+    Students: {
+      teacherAnnouncements.filter(
+        (item) => item.audience === "students"
+      ).length
+    }
+  </span>
+</div>
+
   {teacherAnnouncements.length === 0 ? (
     <div className="bg-slate-50 rounded-2xl p-6 text-center text-slate-500">
       No announcements available.
     </div>
   ) : (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {teacherAnnouncements.map((item) => (
+      {filteredAnnouncements.map((item) => (
         <div
           key={item.id}
           className="border border-slate-200 rounded-2xl p-5 bg-slate-50"
