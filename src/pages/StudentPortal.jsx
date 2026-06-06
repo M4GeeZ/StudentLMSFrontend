@@ -10,12 +10,24 @@ const StudentPortal = () => {
   const [attendance, setAttendance] = useState([]);
   const [loading, setLoading] = useState(true);
   const [studentTimetable, setStudentTimetable] = useState([]);
+  const [studentAnnouncements, setStudentAnnouncements] = useState([]);
 
   useEffect(() => {
   const savedStudentTimetable =
     JSON.parse(localStorage.getItem("studentTimetableRecords")) || [];
 
   setStudentTimetable(savedStudentTimetable);
+}, []);
+
+useEffect(() => {
+  const savedAnnouncements =
+    JSON.parse(localStorage.getItem("announcements")) || [];
+
+  const studentOnly = savedAnnouncements.filter(
+    (item) => item.audience === "students"
+  );
+
+  setStudentAnnouncements(studentOnly);
 }, []);
 
   const config = {
@@ -112,6 +124,62 @@ const StudentPortal = () => {
                 <h2 className="text-4xl font-bold mt-2 text-blue-700">{percentage}%</h2>
               </div>
             </div>
+
+<section className="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 mb-8">
+  <h2 className="text-2xl font-extrabold text-black mb-2">
+    Student Announcements
+  </h2>
+  <p className="text-slate-500 mb-5">
+    Notices published by admin for students.
+  </p>
+
+  {studentAnnouncements.length === 0 ? (
+    <div className="bg-slate-50 rounded-2xl p-6 text-center text-slate-500">
+      No announcements available.
+    </div>
+  ) : (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {studentAnnouncements.map((item) => (
+        <div
+          key={item.id}
+          className="border border-slate-200 rounded-2xl p-5 bg-slate-50"
+        >
+          <div className="flex justify-between gap-3">
+            <div>
+              <p className="text-sm font-bold text-green-600 uppercase">
+                Admin Notice
+              </p>
+
+              <h3 className="font-extrabold text-black text-xl">
+                {item.title}
+              </h3>
+            </div>
+
+            <span
+              className={`h-fit px-3 py-1 rounded-full text-xs font-bold ${
+                item.priority === "Urgent"
+                  ? "bg-red-100 text-red-700"
+                  : item.priority === "Important"
+                  ? "bg-yellow-100 text-yellow-700"
+                  : "bg-blue-100 text-blue-700"
+              }`}
+            >
+              {item.priority}
+            </span>
+          </div>
+
+          <p className="text-slate-600 mt-3">
+            {item.message}
+          </p>
+
+          <p className="text-slate-400 text-sm mt-3">
+            Date: {item.date}
+          </p>
+        </div>
+      ))}
+    </div>
+  )}
+</section>
 
             <section className="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 mb-8">
               <h2 className="text-2xl font-extrabold text-black mb-5">

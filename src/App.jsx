@@ -11,6 +11,8 @@ import FacultyManagement from "./pages/FacultyManagement.jsx";
 import AdminStudentManagement from "./pages/AdminStudentManagement.jsx";
 import SalaryModule from "./pages/SalaryModule.jsx";
 import TimetableModule from "./pages/TimetableModule.jsx";
+import AdminAttendanceOverview from "./pages/AdminAttendanceOverview.jsx";
+import AnnouncementsModule from "./pages/AnnouncementsModule.jsx";
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -35,6 +37,8 @@ const App = () => {
       />
 
       <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      <Route path="/admin/announcements" element={<AnnouncementsModule />} />
+      <Route path="/admin/attendance" element={<AdminAttendanceOverview />} />
       <Route path="/admin/timetable" element={<TimetableModule />} />
       <Route path="/admin/faculty" element={<FacultyManagement />} />
       <Route path="/admin/students" element={<AdminStudentManagement />} />

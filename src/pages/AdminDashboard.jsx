@@ -128,9 +128,12 @@ const AdminDashboard = () => {
             <p className="text-slate-500 mb-4">
               Monitor student and faculty attendance records.
             </p>
-            <button className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-semibold">
-              View Attendance
-            </button>
+            <Link
+  to="/admin/attendance"
+  className="block text-center w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-semibold"
+>
+  View Attendance
+</Link>
           </div>
 
           <div className="bg-white rounded-3xl shadow-xl border p-6">
@@ -140,9 +143,12 @@ const AdminDashboard = () => {
             <p className="text-slate-500 mb-4">
               Publish notices for faculty members and students.
             </p>
-            <button className="w-full bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-xl font-semibold">
-              Create Notice
-            </button>
+            <Link
+  to="/admin/announcements"
+  className="block text-center w-full bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-xl font-semibold"
+>
+  Create Notice
+</Link>
           </div>
         </div>
       </main>
